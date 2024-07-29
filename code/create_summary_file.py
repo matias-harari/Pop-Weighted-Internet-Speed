@@ -16,7 +16,7 @@ gdf['ISO_N3'] = gdf['ISO_N3'].astype(int)
 # SET PARAMETERS
 
 zoom_level = 13
-years = [2023]
+years = [2019, 2020, 2021, 2022, 2023, 2024]
 types = ['mobile', 'fixed'] 
 
 #----------------------------------#
@@ -27,7 +27,7 @@ all_data = []
 for year in years:
     for d_type in types:
         # Read Internet Data
-        input_internet = f"{base_path}/raw_data/internet_speed_{d_type}_{year}_by_quadkey_{zoom_level}.parquet"
+        input_internet = f"{base_path}/data/internet_speed_{d_type}_{year}_by_quadkey_{zoom_level}.parquet.gz"
         input_internet = pd.read_parquet(input_internet)
 
         # Get Coordinates of Quadkey        
@@ -51,20 +51,24 @@ for year in years:
         })
 
         # Format variables
-        avg_d_kbps_by_country[f'{year}_{d_type}_avg_d_mbps'] = round(avg_d_kbps_by_country['avg_d_kbps'] / avg_d_kbps_by_country['tests'] / 1000, 1)
-        avg_d_kbps_by_country[f'{year}_{d_type}_avg_d_mbps_w'] = round(avg_d_kbps_by_country['avg_d_kbps_w'] / avg_d_kbps_by_country['pop_2020'] / 1000, 1)
-        avg_d_kbps_by_country[f'{year}_{d_type}_k_tests'] = round(avg_d_kbps_by_country['tests'] / 1000, 1)
+        avg_d_kbps_by_country['avg_d_mbps'] = round(avg_d_kbps_by_country['avg_d_kbps'] / avg_d_kbps_by_country['tests'] / 1000, 1)
+        avg_d_kbps_by_country['avg_d_mbps_w'] = round(avg_d_kbps_by_country['avg_d_kbps_w'] / avg_d_kbps_by_country['pop_2020'] / 1000, 1)
+        avg_d_kbps_by_country['k_tests'] = round(avg_d_kbps_by_country['tests'] / 1000, 1)
         
         # Append
-        avg_d_kbps_by_country = avg_d_kbps_by_country[[f'{year}_{d_type}_avg_d_mbps', f'{year}_{d_type}_avg_d_mbps_w', f'{year}_{d_type}_k_tests']]
+        avg_d_kbps_by_country = avg_d_kbps_by_country[['avg_d_mbps', 'avg_d_mbps_w', 'k_tests']]
+        avg_d_kbps_by_country['year'] = year
+        avg_d_kbps_by_country['d_type'] = d_type
         all_data.append(avg_d_kbps_by_country)
         
 #----------------------------------#
 # CONCAT AND EXPORT
 
 # Add Data to GDF and export
-concat_data = pd.concat(all_data, axis=1)
-gdf_w_data = gdf.merge(concat_data, left_on='Country', right_index=True, how='left')
+concat_data = pd.concat(all_data, axis=0)
 
-gdf_w_data.to_file(f'{base_path}/data/summary_by_country.geojson', driver='GeoJSON')
+output_file =f'{base_path}/data/internet_speed_summary_by_country.csv'
+concat_data.to_csv(output_file, index=True)
 
+#gdf_w_data = gdf.merge(concat_data, left_on='Country', right_index=True, how='left')
+#gdf_w_data.to_file(f'{base_path}/data/summary_by_country.geojson', driver='GeoJSON')
