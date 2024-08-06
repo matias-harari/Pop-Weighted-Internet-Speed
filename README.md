@@ -16,11 +16,13 @@ This project leverages open Internet test data from [Ookla®](https://github.com
 
    <img src="./assets/3/region_panel_vis_example.png" alt="Region Panel Visualization Example" style="zoom:100%;" />
 
-I share the aggregated data by country, Internet type, and year [here](https://github.com/matias-harari/Pop-Weighted-Internet-Speed/tree/main/data_summary/).  
+I share the aggregated data by country, Internet type, and year [here](https://github.com/matias-harari/Pop-Weighted-Internet-Speed/tree/main/summary_data/).  
 
 ### Comparison with Global Index
 
-Ookla publishes download speed estimates by country on their [Global Index](https://www.speedtest.net/global-index). As of August 2024, their data is limited to the most recent year and does not account for population weights. Their methodology focuses on median speeds, which I cannot replicate using the open data provided (see [Methodology](methodology) for more details).
+Ookla publishes download speed estimates by country on their [Global Index](https://www.speedtest.net/global-index). As of August 2024, their data is limited to the most recent year and does not account for population weights. 
+
+:warning: The Global Index reports median speeds, which I cannot replicate using the open data provided (see [Methodology](methodology) for more details). 
 
 ### Impact of Population Weights
 
@@ -34,15 +36,24 @@ The incorporation of population weights significantly impacts Internet speed cal
 
 **Internet Speed Data**: [Speedtest® by Ookla®](https://github.com/teamookla/ookla-open-data) Global Fixed and Mobile Network Performance Maps was accessed from [AWS](https://aws.amazon.com/marketplace/pp/prodview-breawk6ljkovm#resources). It provides internet speed measurements at the tile level, where each tile is identified by a unique `quadkey`, a standard spatial index developed by [Bing Maps](https://learn.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system). The dataset includes metrics on average download speed, average upload speed, average latency, number of tests, and number of devices. Data is aggregated quarterly, starting from Q1 2019. 
 
-**Population Data**:  Population data at the tile level is obtained from the [WorldPop Project](https://hub.worldpop.org/project/categories?id=3), which provides population estimates for 2020 at a 1 km resolution using unconstrained top-down methods. The raw data is available in GeoTIFF format and can be downloaded from [humdata.org](https://humdata.org). WorldPop does not provide a spatial index for each pixel, so I determine the corresponding `quadkey` for each pixel employing the `pyquadkey2` library (the replication code is not shared in this repository, but I share the output file). As an example, in the next plot I show the distribution of population using a zoom level of 9.
+**Population Data**:  Population data at the tile level is obtained from the [WorldPop Project](https://hub.worldpop.org/project/categories?id=3), which provides population estimates for 2020 at a 1 km resolution using unconstrained top-down methods. The raw data is available in GeoTIFF format and can be downloaded from [humdata.org](https://humdata.org). WorldPop does not provide a spatial index for each pixel, so I determine the corresponding `quadkey` for each pixel employing the `pyquadkey2` library. The replication code to determine the `quadkey`  is not shared in this repository, but I share the output file. 
 
-<img src="./assets/3/AD_4nXcFm65EJ7vXcgqaOvoUXB9sv9JeShAG4ZlB07CbiCtSnhE4aVOiZrsbAM7cRkMTUe78fERY8Cu3eAdGqrpPig9j72NZb9K_mUzNGWxCLv9AMvIxpCeuJfaEoKW1_giJzSGxjYP-dOUd_-ibgcK6l1A8gTIB.png" alt="img" style="zoom:60%;" />
+<img src="./assets/3/5cff54de-5133-4369-8680-52d2723eb756.jpg" alt="Screenshot of three Mercator projection images displaying the quadkey relationships between each level." style="zoom:67%;" />
+
+*Source: example of the `quadkey` system by [Bing Maps](https://learn.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system)*
+
+**Country Boundaries**: I use the [World Bank’s country boundaries](https://datacatalog.worldbank.org/search/dataset/0038272/World-Bank-Official-Boundaries), which also includes country data.
+
+- [To Do: Add polygons for disputed areas]
 
 ### Data Aggregation
 
-**Quadkey Aggregation**: The code aggregate population data and Internet speed metrics in quadkeys at zoom level 13, corresponding to tiles with a side length of approximately 4,892 meters. In the case of population, aggregation consists in summing the population values from tiles of lower resolution. In the case of Internet speed, new average metrics are calculated using the number of tests from tiles of lower resolution as weights. 
+**Spatial Aggregation**: The code aggregate population data and Internet speed metrics in quadkeys at zoom level 13, corresponding to tiles with a side length of approximately 4,892 meters. 
 
-<img src="./assets/3/5cff54de-5133-4369-8680-52d2723eb756.jpg" alt="Screenshot of three Mercator projection images displaying the quadkey relationships between each level." style="zoom:67%;" />
+-  In the case of Internet speed, new average metrics are calculated using the number of tests from tiles of lower resolution as weights. 
+- In the case of population, aggregation consists in summing the population values from tiles of lower resolution. As an example, in the next plot I show the distribution of population using a zoom level of 9.
+
+<img src="./assets/3/AD_4nXcFm65EJ7vXcgqaOvoUXB9sv9JeShAG4ZlB07CbiCtSnhE4aVOiZrsbAM7cRkMTUe78fERY8Cu3eAdGqrpPig9j72NZb9K_mUzNGWxCLv9AMvIxpCeuJfaEoKW1_giJzSGxjYP-dOUd_-ibgcK6l1A8gTIB.png" alt="img" style="zoom:60%;" />
 
 **Year Aggregation**: Internet speed metrics are aggregated at the year level using data from multiple quarters. Again, metrics are weighted based on the number of tests conducted within each quarter.
 
@@ -50,9 +61,9 @@ The incorporation of population weights significantly impacts Internet speed cal
 
 **Summary of Metrics**
 
-- **Number of Tests**: The total number of tests conducted.
-- **Population-Weighted Average Download Speed (Mbps)**: The average download speed  in megabits per second, adjusted on the population size of each tile in the country.
-- **Average Download Speed (Mbps)**: The average download speed in megabits per second, weighted by the number of tests in each tile of the country.
+- **Number of Tests**: The total number of tests conducted. In the Shiny App I express the number of test per 1,000 people using the population reported by the World Bank in 2020.
+- **Population-Weighted Average Download Speed**: The average download speed  in megabits per second, adjusted on the population size of each tile in the country.
+- **Average Download Speed**: The average download speed in megabits per second, weighted by the number of tests in each tile of the country.
 
 ## Replication
 
@@ -64,22 +75,7 @@ The script `main.sh` handles the synchronization of raw data from AWS S3. It use
 
 #### Sync Data Command
 
-The data is downloaded using the following command:
-
-```bash
-aws s3 sync s3://ookla-open-data/${FORMAT}/performance/type=${TYPE}/year=${year}/quarter=${Q}/ ${raw_speed_folder} \
---exact-timestamps \
---no-sign-request
-```
-
-Where:
-
-- `FORMAT` is the data format (e.g., `parquet`).
-- `TYPE` specifies the data type (`fixed` or `mobile`).
-- `year` is the year of the data.
-- `Q` denotes the quarter (1 through 4).
-
-The next command shows an example of how to synchronize the data using the `main.sh` file.
+The next command shows an example of how to synchronize the data using the `main.sh` file. Data is stored in a local folder (`/path/to/raw_speed`). Each parquet file (quarter and Internet type) can weight ~300 MB.
 
 ```bash
 ./main.sh --base_path "/path/to/base" --raw_speed_folder "/path/to/raw_speed" --years "2019,2020,2021" --sync_internet_data 1 --aggregate_data 0
