@@ -1,0 +1,13 @@
+name: Pop-Weighted-Internet-Speed
+title: Pop-Weighted-Internet-Speed
+username: matias-harari
+account: matias-harari
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12417537
+bundleId: 8954312
+url: https://matias-harari.shinyapps.io/Pop-Weighted-Internet-Speed/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: code/__pycache__/__init__.cpython-310.pyc|code/__pycache__/internet_speed_vis.cpython-310.pyc|code/create_summary_file.py|code/main.sh|code/read_and_group_ookla.py|notebooks/__pycache__/sp_vis_functions.cpython-310.pyc|notebooks/.ipynb_checkpoints/internet-speed-notebook-checkpoint.ipynb|notebooks/internet_speed_notebook.ipynb|notebooks/internet-speed-notebook.ipynb|notebooks/sp_vis_functions.py|README.md|assets|data
