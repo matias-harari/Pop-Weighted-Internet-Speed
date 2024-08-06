@@ -1,5 +1,7 @@
 # Pop-Weighted-Internet-Speed
 
+Compare with https://www.speedtest.net/global-index
+
 ### Monitoring Tool
 
 The tool, accessible via the notebook `notebooks/internet-speed-notebook.ipynb`, provides an interactive platform for analyzing internet speed data. Users can filter the data by year, internet type (mobile or fixed), and region to generate various visualizations, including tables and maps with an user-friendly interface.

@@ -9,6 +9,8 @@ base_path = f'/home/{username}/GitHub/Pop-Weighted-Internet-Speed'
 
 # Read WB Boundaries
 gdf = gpd.read_file(f'{base_path}/raw_data/wb_countries/WB_countries_Admin0_10m.shp')
+#gdf['geometry'] = gdf['geometry'].translate(xoff=-0.000000000100041)  # Fix Rounding Issue in WB Boundaries Data
+
 gdf = gdf.rename(columns={'NAME_EN': 'Country'})
 gdf['ISO_N3'] = gdf['ISO_N3'].astype(int)
 
