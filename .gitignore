@@ -1,1 +1,2 @@
-data/internet*
+/data/internet*
+!/data/
