@@ -1,5 +1,7 @@
 /data/
-*__pycache__*
-*ipynb_checkpoints*
+notebooks/__pycache__/
+/code/__pycache__/
+notebooks/.ipynb_checkpoints/
 /rsconnect/
 .gitignore
+/rsconnect/
