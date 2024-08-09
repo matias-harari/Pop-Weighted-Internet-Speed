@@ -30,7 +30,6 @@ spatial_data <- spatial_data %>%
 regions <- spatial_data %>%
   st_drop_geometry()
 
-# Merge DF with the spatial data
 merged_data <- regions %>%
   left_join(df, by = "Country", relationship = "many-to-many")
 
@@ -131,7 +130,7 @@ time_series_plot <- function(merged_data, countries, internet_type, weighted) {
       title = "",
       x = "Year",
       y = "Rank",
-      color = "Country"  # Legend title
+      color = "Country"  
     ) +
     theme_minimal() +
     theme(
@@ -143,7 +142,7 @@ time_series_plot <- function(merged_data, countries, internet_type, weighted) {
     ) +
     scale_y_reverse()
   
-  # Arrange plots in a grid with specific heights
+  # Arrange plots in a grid
   grid.arrange(p1, p2, ncol = 1, heights = c(1, 1))  
 }
 
@@ -243,23 +242,17 @@ server <- function(input, output, session) {
     spatial_data_filtered <- spatial_data %>%
       filter(REGION_WB == input$region | input$region == 'World')
     
-    #spatial_data_filtered <- spatial_data_filtered[st_is_valid(spatial_data_filtered), ]
-    
-    # Calculate center of bounding box
-    
     df_filtered <- spatial_data_filtered %>%
       left_join(df_filtered, by = "Country", relationship = "many-to-many")
     
     df_filtered$yvar = (if (input$weighted) df_filtered$avg_d_mbps_w else df_filtered$avg_d_mbps)
-    
-    # Create Leaflet map
     
     #Define bin cutoffs and categories
     min_yvar <- min(df_filtered$yvar, na.rm = TRUE)
     max_yvar <- max(df_filtered$yvar, na.rm = TRUE)
     bin_cutoffs <- quantile(df_filtered$yvar, probs = c(0,0.1,0.2,0.4,0.6,0.7,0.8,0.9,0.95,1), na.rm = TRUE)
     
-    # Ensure bin cutoffs are unique by adding a small jitter if necessary
+    # adding a small jitter TI BINS
     while (length(unique(bin_cutoffs)) != length(bin_cutoffs)) {
       bin_cutoffs <- jitter(bin_cutoffs)
     }
@@ -299,7 +292,7 @@ server <- function(input, output, session) {
           transform = function(x) sprintf("%d-%d Mbps", round(bin_cutoffs[x]), round(bin_cutoffs[x + 1]))
         )
       ) %>%
-      addScaleBar()  # Optional: Adds a scale bar for better readability
+      addScaleBar() 
   })
 }
 

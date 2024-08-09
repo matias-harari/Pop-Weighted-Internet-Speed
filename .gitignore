@@ -3,4 +3,4 @@ notebooks/__pycache__/
 code/__pycache__/
 notebooks/.ipynb_checkpoints/
 rsconnect/
-.gitignore
+.Rhistory
